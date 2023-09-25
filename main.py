@@ -4,6 +4,7 @@ import signal
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from dpyConsole import Console
 
 from AuditLog.AuditLogReader import auditEntry, handle_disconnect
 load_dotenv()
@@ -13,6 +14,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 client = commands.Bot(command_prefix = ["A", "a"], case_insensitive=True, help_command=None, intents=intents)
+console = Console(client)
 
 
 
@@ -23,6 +25,9 @@ def thread_kill(one=None, two=None):
     os._exit(0)
 signal.signal(signal.SIGINT, thread_kill)
 
+@console.command()
+async def shutdown():
+    thread_kill()
 
 @client.event
 async def on_voice_state_update(member: discord.Member, bef: discord.VoiceState, cur: discord.VoiceState):
@@ -45,6 +50,7 @@ async def main():
     print('bot online')
     async with client:
         await load_extensions()
+        console.start()
         await client.start(TOKEN)
     
 
