@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from dpyConsole import Console
 
 from AuditLog.AuditLogReader import auditEntry, handle_disconnect
+from Renamer.Renamer import renamer, set_async_client
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -53,5 +54,9 @@ async def main():
         console.start()
         await client.start(TOKEN)
     
-
+@client.event
+async def on_ready():
+    set_async_client(client)
+    asyncio.create_task(renamer())
+    
 asyncio.run(main())
