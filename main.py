@@ -5,13 +5,8 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from dpyConsole import Console
-<<<<<<< HEAD
-
-=======
 from OpenAI.openai_integration import get_chatgpt_response  # Import the function
->>>>>>> 7f35293 (ai work pls?)
 from AuditLog.AuditLogReader import auditEntry, handle_disconnect
-from Renamer.Renamer import renamer, set_async_client
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
