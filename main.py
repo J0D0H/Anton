@@ -53,9 +53,13 @@ async def main():
         console.start()
         await client.start(TOKEN)
     
+
 @client.event
-async def on_ready():
-    set_async_client(client)
-    asyncio.create_task(renamer())
+async def on_message(message):
+    if client.user.mentioned_in(message):
+        user_message = message.content  # Get the full message content
+        # Generate a response using OpenAI
+        ai_response = await get_chatgpt_response(user_message)  # Pass the message content to your function
+        await message.channel.send(ai_response)  # Send the AI response back in the channel
     
 asyncio.run(main())
