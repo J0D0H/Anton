@@ -23,7 +23,7 @@ class Basic(commands.Cog):
 
         await ctx.send(
             content=(
-                f"sup nigga"
+                f"sup"
             )
         )
         
