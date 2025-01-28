@@ -46,6 +46,25 @@ async def on_message(message):
     if message.author == client.user:
         return  # Ignore messages from the bot itself
 
+        # Check if the message has an attachment
+    if message.attachments:
+        for attachment in message.attachments:
+            # Check if the attachment is a text file (or any file you want to handle)
+            if attachment.filename.endswith('.txt'):  # You can add more file types if needed
+                # Download the file
+                file_data = await attachment.read()
+                file_content = file_data.decode('utf-8')  # Decode the file content
+
+                # Process the file content (e.g., send it to ChatGPT or log it)
+                await message.channel.send(f"Received a file: {attachment.filename}")
+                await message.channel.send(f"File content:\n```\n{file_content[:1000]}\n```")  # Send first 1000 chars for preview
+
+                # Optionally, save the file locally
+                with open(attachment.filename, "wb") as f:
+                    f.write(file_data)
+
+                await message.channel.send(f"File saved as `{attachment.filename}`.")
+
     # Check if the bot was mentioned
     if client.user.mentioned_in(message):
         current_time=time.time()
