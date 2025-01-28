@@ -61,8 +61,19 @@ async def on_message(message):
         # Generate a response using OpenAI
         ai_response = get_chatgpt_response(user_message)  # Get the AI response
         
-        # Send the AI response back in the channel
-        await message.channel.send(ai_response)
+        if len(ai_response) > 3999:
+            # Create a text file with the response
+            with open("response.txt", "w", encoding="utf-8") as file:
+                file.write(ai_response)
+            
+            # Send the file to the channel
+            await message.channel.send(file=discord.File("response.txt"))
+            
+            # Optionally, delete the file after sending
+            os.remove("response.txt")
+        else:
+            # Send the AI response back in the channel
+            await message.channel.send(ai_response)
 
 async def load_extensions():
     # Load any cog extensions if you're using them
