@@ -50,7 +50,7 @@ async def on_message(message):
     if message.attachments:
         for attachment in message.attachments:
             # Check if the attachment is a text file (or any file you want to handle)
-            if attachment.filename.endswith('.txt'):  # You can add more file types if needed
+            if attachment.filename.endswith('.txt', '.csv', '.json'):  # You can add more file types if needed
                 # Download the file
                 file_data = await attachment.read()
                 file_content = file_data.decode('utf-8')  # Decode the file content
@@ -80,7 +80,7 @@ async def on_message(message):
         # Generate a response using OpenAI
         ai_response = get_chatgpt_response(user_message)  # Get the AI response
         
-        if len(ai_response) > 3999:
+        if len(ai_response) > 1999:
             # Create a text file with the response
             with open("response.txt", "w", encoding="utf-8") as file:
                 file.write(ai_response)
