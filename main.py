@@ -8,15 +8,14 @@ from dotenv import load_dotenv
 from dpyConsole import Console
 from OpenAI.openai_integration import get_chatgpt_response  # Import the function
 from AuditLog.AuditLogReader import auditEntry, handle_disconnect
+# Initialize your bot token and time tracking
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
-
 last_api_call = time.time()
 
 intents = discord.Intents.all()
-client = discord.Client(intents=intents)
-client = commands.Bot(command_prefix = ["A", "a"], case_insensitive=True, help_command=None, intents=intents)
+client = commands.Bot(command_prefix=["A", "a"], case_insensitive=True, help_command=None, intents=intents)
 console = Console(client)
 
 async def shutdown_bot():
@@ -46,11 +45,11 @@ async def on_message(message):
     if message.author == client.user:
         return  # Ignore messages from the bot itself
 
-        # Check if the message has an attachment
+    # Check if the message has an attachment
     if message.attachments:
         for attachment in message.attachments:
             # Check if the attachment is a text file (or any file you want to handle)
-            if attachment.filename.endswith('.txt', '.csv', '.json'):  # You can add more file types if needed
+            if attachment.filename.endswith(('.txt', '.csv', '.json')):  # You can add more file types if needed
                 # Download the file
                 file_data = await attachment.read()
                 file_content = file_data.decode('utf-8')  # Decode the file content
@@ -67,8 +66,8 @@ async def on_message(message):
 
     # Check if the bot was mentioned
     if client.user.mentioned_in(message):
-        current_time=time.time()
-        if current_time - last_api_call < 5: 
+        current_time = time.time()
+        if current_time - last_api_call < 5:
             await message.channel.send("wait fool")
             return
         last_api_call = current_time
@@ -76,20 +75,22 @@ async def on_message(message):
         user_message = message.content  # Get the full message content
         
         await message.channel.send("Processing your request...")  # Inform user
-        
+
         # Generate a response using OpenAI
         ai_response = get_chatgpt_response(user_message)  # Get the AI response
-        
+
+        # Check the length of the AI response and handle large responses
         if len(ai_response) > 1999:
-            # Create a text file with the response
-            with open("response.txt", "w", encoding="utf-8") as file:
+            # Create a temporary file with the response
+            filename = "response.txt"
+            with open(filename, "w", encoding="utf-8") as file:
                 file.write(ai_response)
             
             # Send the file to the channel
-            await message.channel.send(file=discord.File("response.txt"))
+            await message.channel.send(file=discord.File(filename))
             
             # Optionally, delete the file after sending
-            os.remove("response.txt")
+            os.remove(filename)
         else:
             # Send the AI response back in the channel
             await message.channel.send(ai_response)
