@@ -1,5 +1,7 @@
-from openai import OpenAI
 import os
+import asyncio
+import openai
+from openai import OpenAI
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
