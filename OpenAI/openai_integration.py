@@ -10,15 +10,9 @@ load_dotenv()
 # Initialize the OpenAI client
 openai_client = OpenAI(api_key=os.getenv('OPENAIAPIKEY'))
 
-async def get_chatgpt_response(user_message: str) -> str:
-    try:
-        print("Making API request...")
-        response = await asyncio.to_thread(openai.ChatCompletion.create,  # This runs the blocking OpenAI request in a separate thread
-            model="gpt-4",  # Ensure you're using the correct model
+def get_chatgpt_response(user_message: str) -> None:
+    resp = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": user_message}]
         )
-        print("Received response from OpenAI.")
-        return response['choices'][0]['message']['content']
-    except Exception as e:
-        print(f"Error while fetching from OpenAI: {e}")
-        return "Sorry, I couldn't process your request."  # Fallback response
+    return resp.choices[0].message.content

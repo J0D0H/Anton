@@ -5,7 +5,7 @@ python-dotenv==1.0.1
 # dnspython==2.2.1
 discord.py==2.4.0
 discord.py-Console==0.1.2
-openai==1.59.3
+openai==1.60.2
 # aiomysql==0.1.1
 # tiktoken==0.3.3 # ChatGPT Token counting
 audioop-lts==0.2.1

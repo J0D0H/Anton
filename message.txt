@@ -1,0 +1,105 @@
+// Register the widget
+class Access_Widget extends WP_Widget {
+    // Construct the widget
+    public function __construct() {
+        parent::__construct(
+            'access_widget', // Base ID
+            __('Access Widget', 'text_domain'), // Name
+            array('description' => __('Fetch data from an API and display it', 'text_domain')) // Args
+        );
+    }
+
+    // Frontend display of the widget
+    public function widget($args, $instance) {
+        echo $args['before_widget']; // Before widget code
+        echo '<button id="fetch-api-data" style="cursor: pointer;">Fetch API Data</button>'; // Button to fetch data
+        echo $args['after_widget']; // After widget code
+
+        // Enqueue script to handle API fetch
+        ?>
+        <script>
+            document.getElementById('fetch-api-data').onclick = function() {
+                var apiUrl = 'https://api.illiosdigital.com/v1alpha/users/0af27f77-ce5e-4a3e-bb35-d025f11a0469'; // Your API endpoint
+                fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    let output = '<h4>User Information:</h4>';
+                    output += '<p>Name: ' + data.name + '</p>';  // User name
+                    output += '<p>User ID: ' + data.user_id + '</p>'; // User ID
+
+                    // Check for contracted sites
+                    if (Array.isArray(data.contracted_sites) && data.contracted_sites.length > 0) {
+                        output += '<h5>Contracted Sites:</h5><ul>';
+                        data.contracted_sites.forEach(site => {
+                            output += '<li>' + site.domain + ' (Site ID: ' + site.site_id + ')</li>'; // Display contracted site
+                        });
+                        output += '</ul>'; 
+                    } else {
+                        output += '<p>No contracted sites available.</p>';
+                    }
+
+                    // Check for commission sites
+                    if (Array.isArray(data.commission_sites) && data.commission_sites.length > 0) {
+                        output += '<h5>Commission Sites:</h5><ul>';
+                        data.commission_sites.forEach(site => {
+                            output += '<li>' + site.domain + ' (Site ID: ' + site.site_id + ')</li>'; // Display commission site
+                        });
+                        output += '</ul>'; 
+                    } else {
+                        output += '<p>No commission sites available.</p>';
+                    }
+
+                    // Use the shortcode to display the output
+                    document.getElementById('api-response').innerHTML = output; // Update this line to place output in the designated response div on the page
+                })
+                .catch(error => {
+                    document.getElementById('api-response').innerHTML = 'Error fetching data: ' + error.message; // Handle error
+                });
+            };
+        </script>
+        <?php
+    }
+
+    // Backend widget form
+    public function form($instance) {
+        // You can add widget options here if needed
+    }
+
+    // Update the widget's settings
+    public function update($new_instance, $old_instance) {
+        return []; // Handle widget settings here (omitted for simplicity)
+    }
+}
+
+// Register the widget
+function register_access_widget() {
+    register_widget('Access_Widget');
+}
+add_action('widgets_init', 'register_access_widget');
+
+// Function to render API data
+class Access_Shortcode {
+    public function __construct() {
+        add_shortcode('access_data', array($this, 'render_access_data'));
+    }
+
+    public function render_access_data() {
+        ob_start(); // Start output buffering
+        ?>
+        <h2>User Information</h2>
+        <div id="api-response" style="margin-top: 10px;"></div> <!-- Div where the API data will be inserted -->
+        <?php
+        return ob_get_clean(); // Return the buffered content
+    }
+}
+
+// Register shortcode
+function register_access_shortcode() {
+    new Access_Shortcode(); // Create an instance of the shortcode class
+}
+add_action('init', 'register_access_shortcode');

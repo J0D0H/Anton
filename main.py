@@ -54,31 +54,23 @@ async def on_message(message):
                 file_data = await attachment.read()
                 file_content = file_data.decode('utf-8')  # Decode the file content
 
-                # Process the file content (e.g., send it to ChatGPT or log it)
-                await message.channel.send(f"Received a file: {attachment.filename}")
-                await message.channel.send(f"File content:\n```\n{file_content[:1000]}\n```")  # Send first 1000 chars for preview
-
                 # Optionally, save the file locally
                 with open(attachment.filename, "wb") as f:
                     f.write(file_data)
-
-                await message.channel.send(f"File saved as `{attachment.filename}`.")
 
     # Check if the bot was mentioned
     if client.user.mentioned_in(message):
         current_time = time.time()
         if current_time - last_api_call < 5:
-            await message.channel.send("wait fool")
+            await message.channel.send("Wait a moment before asking again.")
             return
         last_api_call = current_time
 
         user_message = message.content  # Get the full message content
         
-        await message.channel.send("Processing your request...")  # Inform user
-
         try:
             # Generate a response using OpenAI asynchronously
-            ai_response = await get_chatgpt_response(user_message)  # Wait for the AI response
+            ai_response = get_chatgpt_response(user_message)  # Wait for the AI response
 
             # Check the length of the AI response and handle large responses
             if len(ai_response) > 1999:
