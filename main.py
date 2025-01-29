@@ -76,24 +76,28 @@ async def on_message(message):
         
         await message.channel.send("Processing your request...")  # Inform user
 
-        # Generate a response using OpenAI
-        ai_response = get_chatgpt_response(user_message)  # Get the AI response
+        try:
+            # Generate a response using OpenAI asynchronously
+            ai_response = await get_chatgpt_response(user_message)  # Wait for the AI response
 
-        # Check the length of the AI response and handle large responses
-        if len(ai_response) > 1999:
-            # Create a temporary file with the response
-            filename = "response.txt"
-            with open(filename, "w", encoding="utf-8") as file:
-                file.write(ai_response)
-            
-            # Send the file to the channel
-            await message.channel.send(file=discord.File(filename))
-            
-            # Optionally, delete the file after sending
-            os.remove(filename)
-        else:
-            # Send the AI response back in the channel
-            await message.channel.send(ai_response)
+            # Check the length of the AI response and handle large responses
+            if len(ai_response) > 1999:
+                # Create a temporary file with the response
+                filename = "response.txt"
+                with open(filename, "w", encoding="utf-8") as file:
+                    file.write(ai_response)
+                
+                # Send the file to the channel
+                await message.channel.send(file=discord.File(filename))
+                
+                # Optionally, delete the file after sending
+                os.remove(filename)
+            else:
+                # Send the AI response back in the channel
+                await message.channel.send(ai_response)
+        except Exception as e:
+            print(f"Error while processing the message: {e}")
+            await message.channel.send("There was an issue processing your request. Please try again.")
 
 async def load_extensions():
     # Load any cog extensions if you're using them

@@ -10,11 +10,12 @@ openai_client = OpenAI(api_key=os.getenv('OPENAIAPIKEY'))
 
 async def get_chatgpt_response(user_message: str) -> str:
     try:
-        # Use the asynchronous API call
+        print("Making API request...")
         response = await asyncio.to_thread(openai.ChatCompletion.create,  # This runs the blocking OpenAI request in a separate thread
             model="gpt-4",  # Ensure you're using the correct model
             messages=[{"role": "user", "content": user_message}]
         )
+        print("Received response from OpenAI.")
         return response['choices'][0]['message']['content']
     except Exception as e:
         print(f"Error while fetching from OpenAI: {e}")
